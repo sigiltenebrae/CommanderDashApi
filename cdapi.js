@@ -6,16 +6,6 @@ const https = require("https");
 const fs = require('fs');
 const axios = require('axios');
 
-const config = require('./config/db.config');
-const Pool = require('pg').Pool
-const pool = new Pool({
-    user: config.USER,
-    host: config.HOST,
-    database: config.DB,
-    password: config.PASSWORD,
-    port: config.PORT,
-});
-
 const decksdb = require('./interfaces/decks');
 
 const app = express();
@@ -28,3 +18,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.post('/', (request, response) => {
     response.json({ info: 'API endpoint for CommanderDash' });});
 
+app.post('/api/decks', decksdb.getAllDecks);
+app.post('/api/deck', decksdb.getDeck);
+
+app.listen(port, () => {
+    console.log(`App running on port ${port}.`);
+});
