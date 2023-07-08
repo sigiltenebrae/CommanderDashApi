@@ -20,7 +20,7 @@ function getAllDecks(request, response) {
                    resolve({decks: decks, error: null});
                }
                else {
-                   resolve({decks: [], error: 'No decks found.'});
+                   resolve({decks: [], error: 'No decks found!'});
                }
            }
         });
@@ -48,13 +48,13 @@ function getDeck(request, response) {
                         resolve({deck: deck, errors: null});
                     }
                     else {
-                        resolve({deck: null, error: 'No deck found with id ' + id});
+                        resolve({deck: null, error: 'No deck found with id ' + id + '!'});
                     }
                 }
             });
         }
         else {
-            resolve({deck: null, error: 'Request missing id field.'});
+            resolve({deck: null, error: 'Request missing id field!'});
         }
     });
     deck_query.then((deck_data) => {

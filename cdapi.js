@@ -7,6 +7,8 @@ const fs = require('fs');
 const axios = require('axios');
 
 const decksdb = require('./interfaces/decks');
+const usersdb = require('./interfaces/users');
+const gamessdb = require('./interfaces/games');
 
 const app = express();
 const port = 3333;
@@ -20,6 +22,10 @@ app.post('/', (request, response) => {
 
 app.post('/api/decks', decksdb.getAllDecks);
 app.post('/api/deck', decksdb.getDeck);
+
+app.get('/api/users', usersdb.getUsers);
+
+app.post('/api/deck/last_played', gamessdb.getLastPlayedDeck);
 
 app.listen(port, () => {
     console.log(`App running on port ${port}.`);
