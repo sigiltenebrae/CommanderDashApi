@@ -62,7 +62,40 @@ function getDeck(request, response) {
     });
 }
 
+/**
+ * Get the commander(s) for the given deck
+ * @returns {commanders: commander[]}
+ */
+function getCommanderForDeck(request, response) {
+    let deck_query = new Promise((resolve) => {
+        if (request.body && request.body.id) {
+            const id = request.body.id;
+            pool.query('SELECT name FROM deck_cards WHERE deckid = ' + id + ' AND iscommander = true', (error, results) => {
+                if (error) {
+                    resolve({commanders: [], error: error});
+                }
+                else {
+                    if (results.rows && results.rows.length > 0) {
+                        let commanders = results.rows;
+                        resolve({commanders: commanders, error: null});
+                    }
+                    else {
+                        resolve({commanders: [], error: 'No commander found for deck with id: ' + id});
+                    }
+                }
+            })
+        }
+        else {
+            resolve({commanders: [], error: 'Request missing id field!'})
+        }
+    });
+    deck_query.then((commander_data) => {
+        return response.json(commander_data);
+    });
+}
+
 module.exports = {
     getAllDecks,
     getDeck,
+    getCommanderForDeck,
 }

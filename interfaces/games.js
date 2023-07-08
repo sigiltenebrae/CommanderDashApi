@@ -20,6 +20,7 @@ function getLastPlayedDeck(request, response) {
                                 else {
                                     if (results2.rows && results2.rows.length > 0) {
                                         let deck = results2.rows[0];
+                                        deck.won_last = game.winner;
                                         resolve2({deck: deck, error: null});
                                     }
                                     else {
@@ -45,6 +46,10 @@ function getLastPlayedDeck(request, response) {
     game_query.then((deck_data) => {
         return response.json(deck_data);
     });
+}
+
+function getWinLossRatioForDeck(request, response) {
+
 }
 
 module.exports = {

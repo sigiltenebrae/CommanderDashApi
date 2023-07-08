@@ -22,6 +22,7 @@ app.post('/', (request, response) => {
 
 app.post('/api/decks', decksdb.getAllDecks);
 app.post('/api/deck', decksdb.getDeck);
+app.post('/api/deck/commander', decksdb.getCommanderForDeck);
 
 app.get('/api/users', usersdb.getUsers);
 
