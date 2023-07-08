@@ -85,7 +85,7 @@ function getWinLossRatioForDeck(request, response) {
     game_query.then((ratio_data) => { return response.json(ratio_data); });
 }
 
-function getWinLossRatioForPlayer(request, response) {
+function getWinLossRatioForUser(request, response) {
     let game_query = new Promise((resolve) => {
         if (request.body && request.body.id) {
             const id = request.body.id;
@@ -122,8 +122,69 @@ function getWinLossRatioForPlayer(request, response) {
     game_query.then((ratio_data) => { return response.json(ratio_data); });
 }
 
+function getAverageWinLossRatio(request, response) {
+    let game_query = new Promise((resolve) => {
+        pool.query('SELECT * FROM users', (error, results) => {
+            if (error) {
+                resolve({ratio: 0, error: error});
+            }
+            else {
+                if (results.rows && results.rows.length > 0) {
+                    let users = results.rows;
+                    let ratio_promises = [];
+                    for (let user of users) {
+                        ratio_promises.push(new Promise((resolve2) => {
+                            pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE player_id = ' + user.id + ' AND games.test = false AND winner=true ORDER BY game_id DESC;', (error, results) => {
+                                if (error) {
+                                    resolve2({ratio: 0, error: error});
+                                }
+                                else {
+                                    if (results.rows && results.rows.length > 0) {
+                                        pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE player_id = ' + user.id + ' AND games.test = false AND winner=false ORDER BY game_id DESC;', (error2, results2) => {
+                                            if (error2) {
+                                                resolve2({ratio: 0, error: error2});
+                                            }
+                                            else {
+                                                if (results2.rows && results2.rows.length > 0) {
+                                                    resolve2({ratio: results.rows.length / (results.rows.length + results2.rows.length), error: null});
+                                                }
+                                                else {
+                                                    resolve2({ratio: results.rows.length, error: null});
+                                                }
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        resolve2({ratio: 0, error: null});
+                                    }
+                                }
+                            });
+                        }));
+                    }
+                    Promise.all(ratio_promises).then((ratio_data) => {
+                        if (ratio_data.length > 0) {
+                            let ratio_sum = ratio_data.reduce((accumulator, r) => {
+                                return accumulator + r.ratio;
+                            }, 0);
+                            resolve({ratio: ratio_sum / ratio_data.length, error: null});
+                        }
+                        else {
+                            resolve({ratio: 0, error: 'No game data found!'});
+                        }
+                    });
+                }
+                else {
+                    resolve({ratio: 0, error: 'No users found!'})
+                }
+            }
+        });
+    });
+    game_query.then((ratio_data) => { return response.json(ratio_data); });
+}
+
 module.exports = {
     getLastPlayedDeck,
     getWinLossRatioForDeck,
-    getWinLossRatioForPlayer
+    getWinLossRatioForUser,
+    getAverageWinLossRatio
 }

@@ -28,7 +28,8 @@ app.get('/api/users', usersdb.getUsers);
 
 app.post('/api/deck/last_played', gamessdb.getLastPlayedDeck);
 app.post('/api/deck/win_loss', gamessdb.getWinLossRatioForDeck);
-app.post('/api/user/win_loss', gamessdb.getWinLossRatioForPlayer);
+app.post('/api/user/win_loss', gamessdb.getWinLossRatioForUser);
+app.post('/api/users/win_loss', gamessdb.getAverageWinLossRatio);
 
 app.listen(port, () => {
     console.log(`App running on port ${port}.`);
