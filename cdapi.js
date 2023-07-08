@@ -27,6 +27,8 @@ app.post('/api/deck/commander', decksdb.getCommanderForDeck);
 app.get('/api/users', usersdb.getUsers);
 
 app.post('/api/deck/last_played', gamessdb.getLastPlayedDeck);
+app.post('/api/deck/win_loss', gamessdb.getWinLossRatioForDeck);
+app.post('/api/user/win_loss', gamessdb.getWinLossRatioForPlayer);
 
 app.listen(port, () => {
     console.log(`App running on port ${port}.`);

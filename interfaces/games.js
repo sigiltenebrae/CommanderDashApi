@@ -49,9 +49,81 @@ function getLastPlayedDeck(request, response) {
 }
 
 function getWinLossRatioForDeck(request, response) {
+    let game_query = new Promise((resolve) => {
+        if (request.body && request.body.id) {
+            const id = request.body.id;
+            pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE deck_id = ' + id + ' AND games.test = false AND winner=true ORDER BY game_id DESC;', (error, results) => {
+                if (error) {
+                    resolve({ratio: 0, error: error});
+                }
+                else {
+                    if (results.rows && results.rows.length > 0) {
+                        pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE deck_id = ' + id + ' AND games.test = false AND winner=false ORDER BY game_id DESC;', (error2, results2) => {
+                            if (error2) {
+                                resolve({ratio: 0, error: error2});
+                            }
+                            else {
+                                if (results2.rows && results2.rows.length > 0) {
+                                    resolve({ratio: results.rows.length / (results.rows.length + results2.rows.length), error: null});
+                                }
+                                else {
+                                    resolve({ratio: results.rows.length, error: null});
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        resolve({ratio: 0, error: null});
+                    }
+                }
+            });
+        }
+        else {
+            resolve({ratio: 0, error: "Request missing id field!"});
+        }
+    });
+    game_query.then((ratio_data) => { return response.json(ratio_data); });
+}
 
+function getWinLossRatioForPlayer(request, response) {
+    let game_query = new Promise((resolve) => {
+        if (request.body && request.body.id) {
+            const id = request.body.id;
+            pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE player_id = ' + id + ' AND games.test = false AND winner=true ORDER BY game_id DESC;', (error, results) => {
+                if (error) {
+                    resolve({ratio: 0, error: error});
+                }
+                else {
+                    if (results.rows && results.rows.length > 0) {
+                        pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE player_id = ' + id + ' AND games.test = false AND winner=false ORDER BY game_id DESC;', (error2, results2) => {
+                            if (error2) {
+                                resolve({ratio: 0, error: error2});
+                            }
+                            else {
+                                if (results2.rows && results2.rows.length > 0) {
+                                    resolve({ratio: results.rows.length / (results.rows.length + results2.rows.length), error: null});
+                                }
+                                else {
+                                    resolve({ratio: results.rows.length, error: null});
+                                }
+                            }
+                        });
+                    }
+                    else {
+                        resolve({ratio: 0, error: null});
+                    }
+                }
+            });
+        }
+        else {
+            resolve({ratio: 0, error: "Request missing id field!"});
+        }
+    });
+    game_query.then((ratio_data) => { return response.json(ratio_data); });
 }
 
 module.exports = {
-    getLastPlayedDeck
+    getLastPlayedDeck,
+    getWinLossRatioForDeck,
+    getWinLossRatioForPlayer
 }
