@@ -1,6 +1,10 @@
 const pool_config = require("../config/pool.config.js");
 const pool = pool_config.getPool();
 
+/**
+ * Get the last played deck for a given user
+ * @returns {deck, error}
+ */
 function getLastPlayedDeck(request, response) {
     let game_query = new Promise((resolve) => {
         if (request.body && request.body.id) {
@@ -48,6 +52,10 @@ function getLastPlayedDeck(request, response) {
     });
 }
 
+/**
+ * Get the Win/Loss ratio for the deck with the given id
+ * @returns {ratio, error}
+ */
 function getWinLossRatioForDeck(request, response) {
     let game_query = new Promise((resolve) => {
         if (request.body && request.body.id) {
@@ -85,6 +93,10 @@ function getWinLossRatioForDeck(request, response) {
     game_query.then((ratio_data) => { return response.json(ratio_data); });
 }
 
+/**
+ * Get the Win/Loss ratio for the user with the given id
+ * @returns {ratio, error}
+ */
 function getWinLossRatioForUser(request, response) {
     let game_query = new Promise((resolve) => {
         if (request.body && request.body.id) {
@@ -122,6 +134,10 @@ function getWinLossRatioForUser(request, response) {
     game_query.then((ratio_data) => { return response.json(ratio_data); });
 }
 
+/**
+ * Get the average Win/Loss ratio for all users
+ * @returns {ratio, error}
+ */
 function getAverageWinLossRatio(request, response) {
     let game_query = new Promise((resolve) => {
         pool.query('SELECT * FROM users', (error, results) => {
