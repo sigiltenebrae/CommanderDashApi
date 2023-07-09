@@ -17,6 +17,9 @@ function getAllDecks(request, response) {
            else {
                if (results.rows && results.rows.length > 0) {
                    let decks = results.rows;
+                   for (let deck of decks) {
+                       deck.colors = JSON.parse(deck.colors);
+                   }
                    resolve({decks: decks, error: null});
                }
                else {
@@ -45,6 +48,7 @@ function getDeck(request, response) {
                 else {
                     if (results.rows && results.rows.length > 0) {
                         let deck = results.rows[0];
+                        deck.colors = JSON.parse(deck.colors);
                         resolve({deck: deck, errors: null});
                     }
                     else {

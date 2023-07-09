@@ -9,7 +9,7 @@ function getLastPlayedDeck(request, response) {
     let game_query = new Promise((resolve) => {
         if (request.body && request.body.id) {
             let id =  request.body.id;
-            pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE player_id = ' + id +  ' AND games.test = false ORDER BY game_id DESC;', (error, results) => {
+            pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE player_id = ' + id +  ' AND games.test = false AND games.started IS NOT NULL ORDER BY game_id DESC;', (error, results) => {
                 if (error) {
                     resolve({deck: null, error: error});
                 }
@@ -60,13 +60,13 @@ function getWinLossRatioForDeck(request, response) {
     let game_query = new Promise((resolve) => {
         if (request.body && request.body.id) {
             const id = request.body.id;
-            pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE deck_id = ' + id + ' AND games.test = false AND winner=true ORDER BY game_id DESC;', (error, results) => {
+            pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE deck_id = ' + id + ' AND games.test = false AND games.started IS NOT NULL AND winner=true ORDER BY game_id DESC;', (error, results) => {
                 if (error) {
                     resolve({ratio: 0, error: error});
                 }
                 else {
                     if (results.rows && results.rows.length > 0) {
-                        pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE deck_id = ' + id + ' AND games.test = false AND winner=false ORDER BY game_id DESC;', (error2, results2) => {
+                        pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE deck_id = ' + id + ' AND games.test = false AND games.started IS NOT NULL AND winner=false ORDER BY game_id DESC;', (error2, results2) => {
                             if (error2) {
                                 resolve({ratio: 0, error: error2});
                             }
@@ -101,7 +101,7 @@ function getWinLossRatioForUser(request, response) {
     let game_query = new Promise((resolve) => {
         if (request.body && request.body.id) {
             const id = request.body.id;
-            pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE player_id = ' + id + ' AND games.test = false AND winner=true ORDER BY game_id DESC;', (error, results) => {
+            pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE player_id = ' + id + ' AND games.test = false AND games.started IS NOT NULL AND winner=true ORDER BY game_id DESC;', (error, results) => {
                 if (error) {
                     resolve({ratio: 0, error: error});
                 }
@@ -150,13 +150,13 @@ function getAverageWinLossRatio(request, response) {
                     let ratio_promises = [];
                     for (let user of users) {
                         ratio_promises.push(new Promise((resolve2) => {
-                            pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE player_id = ' + user.id + ' AND games.test = false AND winner=true ORDER BY game_id DESC;', (error, results) => {
+                            pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE player_id = ' + user.id + ' AND games.test = false AND games.started IS NOT NULL AND winner=true ORDER BY game_id DESC;', (error, results) => {
                                 if (error) {
                                     resolve2({ratio: 0, error: error});
                                 }
                                 else {
                                     if (results.rows && results.rows.length > 0) {
-                                        pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE player_id = ' + user.id + ' AND games.test = false AND winner=false ORDER BY game_id DESC;', (error2, results2) => {
+                                        pool.query('SELECT * FROM game_results RIGHT JOIN games ON game_results.game_id = games.id WHERE player_id = ' + user.id + ' AND games.test = false AND games.started IS NOT NULL AND winner=false ORDER BY game_id DESC;', (error2, results2) => {
                                             if (error2) {
                                                 resolve2({ratio: 0, error: error2});
                                             }
