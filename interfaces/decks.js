@@ -94,6 +94,43 @@ function getCommanderForDeck(request, response) {
     });
 }
 
+
+function updateCommandersDB() {
+    let prom = new Promise((resolve) => {
+        pool.query('SELECT * FROM deck_cards WHERE iscommander = true', (error, results) => {
+            if (error) {
+                resolve();
+            }
+            else {
+                if (results.rows && results.rows.length > 0) {
+                    let commander_promises = [];
+                    for (let commander of results.rows) {
+                        commander_promises.push(new Promise((resolve2) => {
+                            pool.query('INSERT INTO deck_commanders (deckid, name, image, back_image) VALUES ($1, $2, $3, $4)',
+                                [commander.deckid, commander.name, commander.image, commander.back_image], (error2, results2) => {
+                                    if (error2) {
+                                        console.log(error2);
+                                        resolve2();
+                                    }
+                                    else {
+                                        pool.query('DELETE FROM deck_cards WHERE id = ' + commander.id, (error3, results3) => {
+                                            if (error3) {
+                                                console.log(error3);
+                                            }
+                                            resolve2();
+                                        })
+                                    }
+                                })
+                        }));
+                    }
+                    Promise.all(commander_promises).then(() => {console.log('done!'); resolve();});
+                }
+            }
+        })
+    })
+    prom.then()
+}
+
 module.exports = {
     getAllDecks,
     getDeck,
