@@ -98,7 +98,6 @@ function getCommanderForDeck(request, response) {
     });
 }
 
-
 function updateCommandersDB() {
     let prom = new Promise((resolve) => {
         pool.query('SELECT * FROM deck_cards WHERE iscommander = true', (error, results) => {
